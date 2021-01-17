@@ -52,6 +52,20 @@ const userSchema = new Schema({
   ],
 });
 
+// Virtual properties for define relationship between
+// entities or collections.
+// Each time that request:
+// await user.populate('tasks').execPopulate()
+// in the reality will searching all the task created by
+// the user and storage in an array of the propertie user.tasks
+// for then be printed
+
+userSchema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "owner",
+});
+
 // userSchema Methods...
 
 userSchema.methods.generateAuthToken = async function () {
