@@ -13,8 +13,9 @@ const Task = mongoose.model("Task", {
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    //required: true,
+    required: true,
   },
 });
 
+// The User/Task Relationship
 module.exports = Task;
