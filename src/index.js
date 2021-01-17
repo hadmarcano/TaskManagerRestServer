@@ -3,11 +3,10 @@ require("./db/mongoose");
 const express = require("express");
 const morgan = require("morgan");
 
-
 // Import Routers
 
-const userRouter = require('./routes/user');
-const taskRouter = require('./routes/task');
+const userRouter = require("./routes/user");
+const taskRouter = require("./routes/task");
 
 // App-Express
 
@@ -23,7 +22,7 @@ const app = express();
 // });
 
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // Router Middlewares
 
@@ -39,8 +38,6 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`The Server is Listening on port ${port}`);
 });
-
-
 
 // /** Jsonwebtoken example */
 // const jwt = require('jsonwebtoken');
@@ -61,3 +58,15 @@ app.listen(port, () => {
 // }
 
 // myFunction();
+
+// *** Understanding Populate() ***
+
+// const User = require("./models/user");
+
+// const getTask = async () => {
+//   const user = await User.findById("60024ca2a243d91964fecac3");
+//   await user.populate("tasks").execPopulate();
+//   console.log(user.tasks);
+// };
+
+// getTask();
