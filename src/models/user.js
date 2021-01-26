@@ -3,54 +3,60 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { Schema, model } = mongoose;
+const Task = require("./task");
 
-const userSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  age: {
-    type: Number,
-    default: 0,
-    validate(value) {
-      if (value < 0) {
-        throw new Error("age must be a positive number");
-      }
+const userSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-  },
-  email: {
-    type: String,
-    unique: true,
-    required: true,
-    trim: true,
-    lowercase: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Please enter an Email valid");
-      }
-    },
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 7,
-    validate(value) {
-      if (value.toLowerCase().includes("password")) {
-        throw new Error("The Password don't be contain the (password) word");
-      }
-    },
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true,
+    age: {
+      type: Number,
+      default: 0,
+      validate(value) {
+        if (value < 0) {
+          throw new Error("age must be a positive number");
+        }
       },
     },
-  ],
-});
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+      lowercase: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Please enter an Email valid");
+        }
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 7,
+      validate(value) {
+        if (value.toLowerCase().includes("password")) {
+          throw new Error("The Password don't be contain the (password) word");
+        }
+      },
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  }
+);
 
 // Virtual properties for define relationship between
 // entities or collections.
@@ -129,6 +135,14 @@ userSchema.pre("save", async function (next) {
     console.log(e);
   }
 
+  next();
+});
+
+// Delete user Tasks whe user is removed
+
+userSchema.pre("remove", async function (next) {
+  const user = this;
+  await Task.deleteMany({ owner: user._id });
   next();
 });
 
