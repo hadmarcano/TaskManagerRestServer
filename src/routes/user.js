@@ -4,6 +4,7 @@ const auth = require("../middleware/auth");
 const multer = require("multer");
 const sharp = require("sharp");
 const handlingUploadError = require("../middleware/handlingUploadErrors");
+// const sendWelcomeEmail = require("../emails/account");
 const router = new express.Router();
 
 const upload = multer({
@@ -32,10 +33,11 @@ router.post("/users", async (req, res) => {
   const user = new User(req.body);
   try {
     const token = await user.generateAuthToken();
+    // await sendWelcomeEmail(user.email, user.name);
     await user.save();
     res.status(201).send({ user, token });
-  } catch (e) {
-    res.status(400).send(e);
+  } catch (error) {
+    res.status(400).send(error);
   }
 });
 
