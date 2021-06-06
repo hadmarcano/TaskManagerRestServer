@@ -4,7 +4,7 @@ const auth = require("../middleware/auth");
 const multer = require("multer");
 const sharp = require("sharp");
 const handlingUploadError = require("../middleware/handlingUploadErrors");
-// const sendWelcomeEmail = require("../emails/account");
+const { sendWelcomeEmail, sendCancelationEmail } = require("../emails/account");
 const router = new express.Router();
 
 const upload = multer({
@@ -32,9 +32,9 @@ const upload = multer({
 router.post("/users", async (req, res) => {
   const user = new User(req.body);
   try {
-    const token = await user.generateAuthToken();
-    // await sendWelcomeEmail(user.email, user.name);
     await user.save();
+    await sendWelcomeEmail(user.email, user.name);
+    const token = await user.generateAuthToken();
     res.status(201).send({ user, token });
   } catch (error) {
     res.status(400).send(error);
@@ -114,6 +114,7 @@ router.delete("/users/me", auth, async (req, res) => {
 
     // Instead that code writed before, we can delete an user with the async 'remove()' method of mongoose:
     await req.user.remove();
+    sendCancelationEmail(req.user.email, req.user.name);
     res.send(req.user);
   } catch (e) {
     res.status(500).send(e);

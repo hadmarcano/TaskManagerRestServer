@@ -2,9 +2,8 @@ const dotenv = require("dotenv");
 const sgMail = require("@sendgrid/mail");
 dotenv.config();
 
-// const sendgridAPIKEY = process.env.SENDGRID_API_KEY;
-const sendgridAPIKEY =
-  "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";
+const sendgridAPIKEY = process.env.SENDGRID_API_KEY;
+// "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";
 
 sgMail.setApiKey(sendgridAPIKEY);
 
@@ -22,6 +21,20 @@ const sendWelcomeEmail = (email, name) => {
     .catch((error) => console.log(error));
 };
 
+const sendCancelationEmail = (email, name) => {
+  const msg = {
+    to: `${email}`,
+    from: "hadmarcano@gmail.com",
+    subject: "See you soon!",
+    text: `${name}, Unfortunately, this time we say goodbye, grateful to have been part of our community. We hope you come back soon, Greetings!`,
+  };
+  sgMail
+    .send(msg)
+    .then((response) => response)
+    .catch((error) => console.log(error));
+};
+
 module.exports = {
   sendWelcomeEmail,
+  sendCancelationEmail,
 };
