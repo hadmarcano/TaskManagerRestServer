@@ -64,7 +64,7 @@ test("Should login existing user", async () => {
     })
     .expect(200);
 
-  // Assertions: Fetch the use from the database
+  // Assertions: Fetch the user from the database
   const user = await User.findById(response.body.user._id);
   expect(user).not.toBeNull();
   // Assert that the token in response matches users second token
@@ -115,4 +115,43 @@ test("Should delete account for user", async () => {
 
 test("Should not delete account for unauthenticated user", async () => {
   await request(app).delete("/users/me").send().expect(401);
+});
+
+test("Shoud upload avatar image", async () => {
+  await request(app)
+    .post("/users/me/avatar")
+    .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
+    .attach("avatars", "tests/fixtures/profile-pic.jpg")
+    .expect(200);
+
+  const user = await User.findById(userOneId);
+  expect(user.avatar).toEqual(expect.any(Buffer));
+});
+
+test("Should update valid user fields", async () => {
+  const response = await request(app)
+    .patch("/users/me")
+    .set("authorization", `Bearer ${userOne.tokens[0].token}`)
+    .send({
+      name: "Juancito",
+    })
+    .expect(200);
+
+  // Assert that the name has changed in database
+  const user = await User.findById(response.body._id);
+  expect(user.name).toBe("Juancito");
+});
+
+test("Should not update invalid user fields", async () => {
+  const response = await request(app)
+    .patch("/users/me")
+    .set("Authorization", `Bearer ${userOne.tokens[0].token}`)
+    .send({
+      location: "Venezuela",
+    })
+    .expect(400);
+
+  // Assert that the location don't exist for the user
+
+  expect(response.body.Error).not.toBeNull();
 });
